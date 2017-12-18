@@ -1,0 +1,4 @@
+
+create it init version at 2017/12/18
+
+gcc inifile_1.0.c -o inifile
