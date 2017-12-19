@@ -1,19 +1,4 @@
 
-/*
-*   程序设计为读写操作ini文件使用，设计思想：
-*   ini文件节点构成一个链表，链表中每个节点下有键值链表,如果文件刚刚开始为注释，则为一个节点。
-*   每对键值构成键值链表中一个节点，
-*   其实读写ini文件就是对这些节点的操作
-*   ini文件中空白符与制表符自动忽略
-*
-*
-*	注意下面几个常量的定义，长度不能越界
-*	每个节点或者键值字符串最大长度不能大于 MAX_STRING_LEN
-*	文件名长度不能大于MAX_FILENAME_LEN
-*	配置文件中每一行长度不能大于 MAX_FILLINE_LEN
-*	传递参数字符数组必须以'\0'结尾
-*/
-
 #include <stdio.h>
 #include <memory.h>
 #include <malloc.h>
@@ -23,7 +8,6 @@
 #include <assert.h>
 #include <pthread.h> 
 
-//#include <sys/io.h>
 #include <fcntl.h>
 #include <errno.h>
 
