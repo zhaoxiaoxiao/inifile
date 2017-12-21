@@ -11,7 +11,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "inifile_1.0.h"
+#include "inifile.h"
 
 #define CONTENT_NEELINE_SIGN			10
 #define CONTENT_SPACE_SIGN				32

@@ -1,4 +1,7 @@
 
+#include <stdio.h> 
+#include <stdlib.h>
+#include <memory.h>
 #include <assert.h>
 
 #include "memory_pool.h"
@@ -51,6 +54,7 @@ void* mpl_calloc(size_t size)
 }
 
 #if 0
+//memory alignment
 void* mpl_memalign_posix(size_t alignment, size_t size)
 {
 	void *p = NULL;
@@ -254,3 +258,8 @@ static void* mpl_palloc_large(MPL_POOL_S *pool, size_t size)
     return p;
 }
 
+
+int main(int argc,void **argv)
+{
+	return 0;
+}

@@ -33,12 +33,12 @@ typedef struct mpl_pool_data_s{
 	unsigned int		failed;
 }MPL_POOL_DATA_S;
 
-typedef struct mpl_pool_s{
+struct mpl_pool_s{
 	MPL_POOL_DATA_S		d;
 	size_t				max;
 	MPL_POOL_S			*current;
 	MPL_POOL_LARGE_S	*large;
-}MPL_POOL_S;
+};
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
