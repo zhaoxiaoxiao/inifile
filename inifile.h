@@ -12,7 +12,7 @@ extern "C" {
 #define INIFILE_SIZE_SPACE				(1024 * 3)//define max inifile memory size;use in inifile stack
 
 #define INIFILE_MAX_CONTENT_LINELEN		1024
-//////////////////////////////////////////////////////////////////////////constant define
+//////////////////////////////////////////////////////////////////////////common constant define
 #define CONTENT_NEELINE_SIGN			10
 #define CONTENT_SPACE_SIGN				32
 #define CONTENT_TAB_SIGN				9
@@ -22,12 +22,21 @@ extern "C" {
 #define CONTENT_COMMA_SIGN				59//;
 #define CONTENT_EQUALITY_SIGN			61//=
 
+typedef enum ini_file_line_type
+{
+	LINE_SECTION,
+	LINE_KEYVALUE,
+	LINE_NOTE,
+	LINE_BLANK,
+	LINE_ERROR,
+}INI_FILE_LINE_TYPE;
 //////////////////////////////////////////////////////////////////////////ERROR CODE DEFINE
 
 #define INIFILE_NO_EXIST				-1
 #define INIFILE_ALREADY_INIT			-2
 #define INIFILE_FORMAT_ERROR			-3
 #define INIFILE_POWER_ERROR				-4
+#define INIFILE_NEVER_LOAD				-5
 
 #define INIFILE_SYSTEM_ERROR			-11
 #define INIFILE_REWRITE_ERROR			-12
@@ -63,7 +72,9 @@ typedef struct ini_parameter{
 //if filename end of '\0' the len can be 0
 int init_ini_file(const char *filename,int len);
 
-const char *get_value_ofkey(int ini_fd,INI_PARAMETER *parameter);
+//if this interface is thread safe and this must consider whit other function safe
+//parameter.value must point empty str to stroge str.and the value_len is the len of this mem size
+int get_value_ofkey(int ini_fd,INI_PARAMETER *parameter);
 
 int update_value_ofkey(int ini_fd,INI_PARAMETER *parameter);
 
