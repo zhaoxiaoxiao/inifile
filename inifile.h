@@ -12,6 +12,9 @@ extern "C" {
 #define INIFILE_SIZE_SPACE				(1024 * 3)//define max inifile memory size;use in inifile stack
 
 #define INIFILE_MAX_CONTENT_LINELEN		1024
+#define INIFILE_SYSTEM_CMD_LEN			512
+#define INIFILE_FILEALL_NAME_LEN		128
+#define INIFILE_SPACE_CHAR_LEN			1
 //////////////////////////////////////////////////////////////////////////common constant define
 #define CONTENT_NEELINE_SIGN			10
 #define CONTENT_SPACE_SIGN				32
@@ -30,6 +33,9 @@ typedef enum ini_file_line_type
 	LINE_BLANK,
 	LINE_ERROR,
 }INI_FILE_LINE_TYPE;
+
+static const char tem_suff_name[] = ".tmp";
+
 //////////////////////////////////////////////////////////////////////////ERROR CODE DEFINE
 
 #define INIFILE_NO_EXIST				-1

@@ -31,6 +31,11 @@ create it init version at 2017/12/18
 *	传递参数字符数组必须以'\0'结尾
 */
 
+线程安全仅仅需要考虑到不要导致程序访问非法指针就可以。
+至于线程先后执行效果则没有办法控制。
+
+thread safe
+
 modify it at 2017/12/20
 
 inifile.h is define interface head file.

@@ -21,13 +21,13 @@ clean:
 	rm -f $(MALLOC_TARGET) $(STACK_TARGET) $(POOL_TARGET) $(MALLOC_OBJS) $(STACK_OBJS) $(POOL_OBJS)
 
 $(MALLOC_TARGET):$(MALLOC_OBJS)
-	$(CC) -o $(TARGET) $^ $(LIBDIRS) $(LIBS)
+	$(CC) -o $(MALLOC_TARGET) $^ $(LIBDIRS) $(LIBS)
 
 $(STACK_TARGET):$(STACK_OBJS)
-	$(CC) -o $(TARGET) $^ $(LIBDIRS) $(LIBS)
+	$(CC) -o $(STACK_TARGET) $^ $(LIBDIRS) $(LIBS)
 
 $(POOL_TARGET):$(POOL_OBJS)
-	$(CC) -o $(TARGET) $^ $(LIBDIRS) $(LIBS)
+	$(CC) -o $(POOL_TARGET) $^ $(LIBDIRS) $(LIBS)
 
 .c.o:
 	$(CC) $(DEBUGFLAG) -fPIC -c $< -o $@ $(INCLUDE)

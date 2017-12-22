@@ -13,21 +13,9 @@
 
 #include "inifile.h"
 
-#define CONTENT_NEELINE_SIGN			10
-#define CONTENT_SPACE_SIGN				32
-#define CONTENT_TAB_SIGN				9
 
-#define CONTENT_LEFT_BRACKET			91//[
-#define CONTENT_RIGHT_BRACKET			93///]
-#define CONTENT_COMMA_SIGN				59//;
-#define CONTENT_EQUALITY_SIGN			61//=
+#define INIFILE_KEYVALUE_ARRAY_LEN		(MAX_KEYVALUE_UNDER_SECTION)
 
-#define INIFILE_MAX_CONTENT_LINELEN		1024
-#define INIFILE_KEYVALUE_ARRAY_LEN		(MAX_INIFILE_SECTION_NUM * MAX_KEYVALUE_UNDER_SECTION)
-
-#define INIFILE_SPACE_CHAR_LEN			1
-#define INIFILE_SYSTEM_CMD_LEN			512
-#define INIFILE_FILEALL_NAME_LEN		128
 
 #define IS_SHOWDEBUG_MESSAGE			1
 
@@ -46,15 +34,6 @@
 
 #define PERROR(fmt, args...)	fprintf(stderr, "%s :: %s() %d: " fmt,__FILE__, \
 									__FUNCTION__, __LINE__, ## args)
-
-typedef enum ini_file_line_type
-{
-	LINE_SECTION,
-	LINE_KEYVALUE,
-	LINE_NOTE,
-	LINE_BLANK,
-	LINE_ERROR,
-}INI_FILE_LINE_TYPE;
 
 typedef struct memory_pool{
 	int flag;
@@ -103,12 +82,11 @@ typedef struct ini_file_array{
 	pthread_mutex_t array_lock;
 }INI_FILE_ARRAY;
 
-static MEMORY_POOL pool_mem = {0};
-static INI_FILE_ARRAY ini_array = {0};
-static INI_SECTION_ARRAY section_array = {0};
-static INI_KEYVALUE_ARRAY keyval_array = {0};
+static MEMORY_POOL pool_mem;
+static INI_FILE_ARRAY ini_array ;
+static INI_SECTION_ARRAY section_array;
+static INI_KEYVALUE_ARRAY keyval_array;
 
-static const char tem_suff_name[] = ".tmp";
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int str_int_len(const char *str)
 {
@@ -567,7 +545,7 @@ INI_SETION *find_inifile_section(INI_SETION * head,const char *name,int len)
 int init_line_section(char *line)
 {
 	int index = 0,len = 0,ret = 0;
-	char *pp = line,*p_brack = NULL,*q_brack = NULL;
+	char *p_brack = NULL,*q_brack = NULL;
 	INI_SETION *p_section = section_array.section_array;
 	
 	p_brack = str_frist_constchar(line,CONTENT_LEFT_BRACKET);
@@ -1166,8 +1144,9 @@ int init_ini_file(const char *filename,int len)
 	return index;
 }
 
-const char *get_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
+int get_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
 {
+#if 0
 	const char *value = NULL;
 	INI_FILE *p_ini_file = ini_array.ini_array;
 	INI_SETION *p_section = NULL;
@@ -1196,6 +1175,8 @@ const char *get_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
 error_out:
 	pthread_mutex_unlock(&p_ini_file->file_lock);
 	return value;
+#endif
+	return 0;
 }
 
 int update_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
@@ -1239,7 +1220,7 @@ error_out:
 
 int add_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
 {
-	int ret = 0,index = 0,len = 0;
+	int ret = 0,len = 0;
 	char line[INIFILE_MAX_CONTENT_LINELEN] = {0},*p_char = NULL;
 	INI_FILE *p_ini_file = ini_array.ini_array;
 	INI_SETION *p_section = NULL;
@@ -1428,7 +1409,6 @@ int add_ini_section(int ini_fd,INI_PARAMETER *parameter)
 	char line[INIFILE_MAX_CONTENT_LINELEN] = {0},*p_char = NULL;
 	INI_FILE *p_ini_file = ini_array.ini_array;
 	INI_SETION *p_section = NULL,*p_sec_end = NULL;
-	INI_KEYVALUE *p_keyval = NULL;
 	if(ini_fd < 0 || ini_fd >= MAX_OPERATION_FILE_NUM || parameter == NULL ||
 		parameter->section == NULL)
 	{

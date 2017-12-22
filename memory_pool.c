@@ -258,8 +258,3 @@ static void* mpl_palloc_large(MPL_POOL_S *pool, size_t size)
     return p;
 }
 
-
-int main(int argc,void **argv)
-{
-	return 0;
-}
