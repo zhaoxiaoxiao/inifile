@@ -828,8 +828,7 @@ int rewrite_after_update(const char *filename,INI_PARAMETER *parameter)
 								memcpy(mod_line,line,len);
 								p_char = find_frist_endchar(mod_line);
 							
-								len = parameter->value_len + 1;
-								snprintf(p_char,len,"%s",parameter->value);
+								sprintf(p_char,"%s",parameter->value);
 								p_comma = str_frist_constchar(p_value,CONTENT_COMMA_SIGN);
 								if(p_comma)
 								{
@@ -898,16 +897,6 @@ int rewrite_after_add(const char *filename,INI_PARAMETER *parameter)
 
 	if(parameter->key == NULL)
 	{
-		len = parameter->section_len + 1;
-		p_char = line;
-		*p_char = CONTENT_LEFT_BRACKET;
-		p_char++;
-		snprintf(p_char,len,"%s",parameter->section);
-		p_char = find_frist_endchar(p_char);
-		sprintf(p_char,"]\n\n");
-		len = str_int_len(line);
-		fwrite(line,INIFILE_SPACE_CHAR_LEN,len,wp);
-		memset(line,0,INIFILE_MAX_CONTENT_LINELEN);
 		flag = 1;
 	}else{
 		if(parameter->key_len <= 0)
@@ -939,13 +928,11 @@ int rewrite_after_add(const char *filename,INI_PARAMETER *parameter)
 						if(ret == 0)
 						{
 							p_char = find_frist_endchar(p_char);
-							len = parameter->key_len + 1;
-							snprintf(p_char,len,"%s",parameter->key);
+							sprintf(p_char,"%s",parameter->key);
 							p_char = find_frist_endchar(p_char);
 							sprintf(p_char,"\t=\t");
 							p_char = find_frist_endchar(p_char);
-							len = parameter->value_len + 1;
-							snprintf(p_char,len,"%s",parameter->value);
+							sprintf(p_char,"%s",parameter->value);
 							p_char = find_frist_endchar(p_char);
 							*p_char = CONTENT_NEELINE_SIGN;
 							flag = 1;
@@ -964,6 +951,14 @@ int rewrite_after_add(const char *filename,INI_PARAMETER *parameter)
 					break;
 			}
 		}
+		len = str_int_len(line);
+		fwrite(line,INIFILE_SPACE_CHAR_LEN,len,wp);
+		memset(line,0,INIFILE_MAX_CONTENT_LINELEN);
+	}
+	if(parameter->key == NULL)
+	{
+		p_char = line;
+		sprintf(p_char,"[%s]\n\n",parameter->section);
 		len = str_int_len(line);
 		fwrite(line,INIFILE_SPACE_CHAR_LEN,len,wp);
 		memset(line,0,INIFILE_MAX_CONTENT_LINELEN);
@@ -1252,13 +1247,11 @@ int add_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
 				parameter->value_len = str_int_len(parameter->value);
 	
 			p_char = line;
-			len = parameter->key_len + 1;
-			snprintf(p_char,len,"%s",parameter->key);
+			sprintf(p_char,"%s",parameter->key);
 			p_char = find_frist_endchar(p_char);
 			*p_char = CONTENT_EQUALITY_SIGN;
 			p_char++;
-			len = parameter->value_len + 1;
-			snprintf(p_char,len,"%s",parameter->value);
+			sprintf(p_char,"%s",parameter->value);
 	
 			//sprintf(line,"%s=%s",parameter->key,parameter->value);
 			p_keyval = keyval_array.keyval_array;
@@ -1431,8 +1424,7 @@ int add_ini_section(int ini_fd,INI_PARAMETER *parameter)
 		p_char = line;
 		*p_char = CONTENT_LEFT_BRACKET;
 		p_char++;
-		len = parameter->section_len + 1;
-		snprintf(p_char,len,"%s",parameter->section);
+		sprintf(p_char,"%s",parameter->section);
 		p_char = find_frist_endchar(p_char);
 		*p_char = CONTENT_RIGHT_BRACKET;
 		//sprintf(line,"[%s]",parameter->section);
@@ -1549,32 +1541,27 @@ void ini_file_info_out(int ini_fd)
 int main(int argc, char *argv[])
 {
 	int fd = 0,ret = 0;
-	const char *value = NULL;
-	char in_sec[] = "xiaoxiao",add_sec[] = "jinyu";
-	char in_key[] = "name",add_key[] = "lover";
-	char up_value[] = "goodman",add_value[] = "yunying";
+	char value[100] = {0};
+	char get_set[] = "cluster",get_key[] = "node5";
+	char add_sec[] = "xiaoxiao";
+	char add_key[] = "wife",add_value[] = "yunying";
+	char key[] = "daughter",val[] = "xinxin";
+	char age_key[] = "age",age_val[] = "27",up_value[] = "28";
 	INI_PARAMETER ini_parameter = {0};
 	
 	fd = init_ini_file("redis_cluster.ini",0);
 	if(fd < 0)
 		return fd;
 	ini_file_info_out(fd);
-#if 0
-	ini_parameter.section = in_sec;
-	ini_parameter.key = in_key;
-	ini_parameter.value = up_value;
-	value = get_value_ofkey(fd,&ini_parameter);
-	if(value)
-		printf("value:: %s\n",value);
-	update_value_ofkey(fd,&ini_parameter);
-	ini_file_info_out(fd);
 
+	memset(&ini_parameter,0,sizeof(INI_PARAMETER));
 	ini_parameter.section = add_sec;
-	ini_parameter.key = add_key;
-	ini_parameter.value = add_value;
+	ini_parameter.key = key;
+	ini_parameter.value = val;
 	ret = add_value_ofkey(fd,&ini_parameter);
-	ini_file_info_out(fd);
-#endif
+	PDEBUG("add_value_ofkey :: %d\n",ret);
+
+	
 	destroy_ini_source(fd);
 	return 0;
 }

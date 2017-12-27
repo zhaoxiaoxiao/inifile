@@ -420,11 +420,7 @@ int rewrite_after_add(const char *filename,INI_PARAMETER *parameter)
 	if(parameter->key == NULL)
 	{
 		p_char = line;
-		*p_char = CONTENT_LEFT_BRACKET;
-		p_char++;
-		sprintf(p_char,"%s",parameter->section);
-		p_char = find_frist_endchar(p_char);
-		sprintf(p_char,"]\n\n");
+		sprintf(p_char,"[%s]\n\n",parameter->section);
 		len = str_int_len(line);
 		fwrite(line,INIFILE_SPACE_CHAR_LEN,len,wp);
 		memset(line,0,INIFILE_MAX_CONTENT_LINELEN);
@@ -1645,8 +1641,8 @@ int main(int argc, char *argv[])
 #endif
 	memset(&ini_parameter,0,sizeof(INI_PARAMETER));
 	ini_parameter.section = add_sec;
-	ini_parameter.key = add_key;
-	ini_parameter.value = add_value;
+	ini_parameter.key = key;
+	ini_parameter.value = val;
 	ret = add_value_ofkey(fd,&ini_parameter);
 	PDEBUG("add_value_ofkey :: %d\n",ret);
 	
