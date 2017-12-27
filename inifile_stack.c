@@ -1146,8 +1146,7 @@ int init_ini_file(const char *filename,int len)
 
 int get_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
 {
-#if 0
-	const char *value = NULL;
+	int ret = 0;
 	INI_FILE *p_ini_file = ini_array.ini_array;
 	INI_SETION *p_section = NULL;
 	INI_KEYVALUE *p_keyval = NULL;
@@ -1162,21 +1161,28 @@ int get_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
 	p_section = find_inifile_section(p_ini_file->head,parameter->section,parameter->section_len);
 	if(p_section == NULL)
 	{
-		value = NULL;
+		ret = INIFILE_SECTION_NOFOUND;
 		goto error_out;
 	}
 	p_keyval = find_keyvalue_unsect(p_section->head,parameter->key,parameter->key_len);
 	if(p_keyval == NULL)
 	{
-		value = NULL;
+		ret = INIFILE_KEYVALUE_NOFOUND;
 		goto error_out;
 	}
-	value = p_keyval->value;
+	ret = str_int_len(p_keyval->value);
+	if(ret >= parameter->value_len)
+	{
+		ret = INIFILE_NUM_OUT_ARRAY;
+		goto error_out;
+	}
+
+	memcpy(parameter->value,p_keyval->value,ret);
+	ret = 0;
 error_out:
 	pthread_mutex_unlock(&p_ini_file->file_lock);
-	return value;
-#endif
-	return 0;
+	return ret;
+
 }
 
 int update_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
@@ -1549,7 +1555,7 @@ int main(int argc, char *argv[])
 	char up_value[] = "goodman",add_value[] = "yunying";
 	INI_PARAMETER ini_parameter = {0};
 	
-	fd = init_ini_file("conf/wc_db.conf",0);
+	fd = init_ini_file("redis_cluster.ini",0);
 	if(fd < 0)
 		return fd;
 	ini_file_info_out(fd);
@@ -1562,13 +1568,13 @@ int main(int argc, char *argv[])
 		printf("value:: %s\n",value);
 	update_value_ofkey(fd,&ini_parameter);
 	ini_file_info_out(fd);
-#endif
+
 	ini_parameter.section = add_sec;
 	ini_parameter.key = add_key;
 	ini_parameter.value = add_value;
 	ret = add_value_ofkey(fd,&ini_parameter);
 	ini_file_info_out(fd);
-	
+#endif
 	destroy_ini_source(fd);
 	return 0;
 }

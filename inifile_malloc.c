@@ -54,7 +54,7 @@ typedef struct ini_file_s{
 }INI_FILE_S;
 
 static INI_FILE_S	*head = NULL,*tail = NULL;
-pthread_mutex_t init_lock;
+static pthread_mutex_t init_lock;
 
 KEY_VALUE_NODE* find_keyvalue_unsect(FILE_SECTION_NODE *p,const char *key,int len);
 FILE_SECTION_NODE* find_inifile_section(INI_FILE_S *p,const char *section,int len);
@@ -995,7 +995,7 @@ void destroy_all_section_mem(INI_FILE_S *p)
 int init_ini_file(const char *filename,int len)
 {
 	char *file_name = NULL;
-	int name_len = 0,ret = 0,result = 0,add = 0;
+	int name_len = 0,ret = 0,add = 0;
 	INI_FILE_S *p_file = NULL;
 
 	if(filename == NULL)
@@ -1016,7 +1016,8 @@ int init_ini_file(const char *filename,int len)
 	file_name = (char *)malloc_memset(name_len);
 	if(file_name == NULL)
 	{
-		return INIFILE_SYSTEM_ERROR;
+		ret = INIFILE_SYSTEM_ERROR;
+		goto error_out;
 	}
 	memcpy(file_name,filename,len);
 	ret = access(file_name, 6);
@@ -1029,10 +1030,9 @@ int init_ini_file(const char *filename,int len)
 
 	if(head)
 	{
-		result = check_inifile_isinit(filename,len,&p_file);
-		if(result < 0)
+		ret = check_inifile_isinit(filename,len,&p_file);
+		if(ret < 0)
 		{
-			ret = result;
 			goto error_out;
 		}
 	}
@@ -1059,7 +1059,8 @@ int init_ini_file(const char *filename,int len)
 	if(add)
 		add_inifile_node(p_file);
 	pthread_mutex_unlock(&init_lock);
-	return result;
+	ret = 0;
+	return ret;
 error_out:
 	if(file_name)
 		free(file_name);

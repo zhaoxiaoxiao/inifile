@@ -1,9 +1,14 @@
-#ifndef __PROGRAM_INIFILE_VTWO_H__
-#define __PROGRAM_INIFILE_VTWO_H__
+/*
+ *ini file modul - a modul to deal with ini file operation
+ *Copyright (C) 2017 xiaoxiao
+ *
+ *write use there interface ust three ways : malloc,memory pool,stack memory
+ */
+#ifndef __XIAOXIAO_INIFILE_MODUL_H__
+#define __XIAOXIAO_INIFILE_MODUL_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 #define MAX_OPERATION_FILE_NUM			2//The macro define max inifile can operation same time;use in inifile stack
 #define MAX_INIFILE_SECTION_NUM			10//define max section in each inifile;use in inifile stack
@@ -36,7 +41,7 @@ typedef enum ini_file_line_type
 
 static const char tem_suff_name[] = ".tmp";
 
-//////////////////////////////////////////////////////////////////////////ERROR CODE DEFINE
+//////////////////////////////////////////////////////////////////////////ERROR CODE MACRO
 
 #define INIFILE_NO_EXIST				-1
 #define INIFILE_ALREADY_INIT			-2
@@ -58,13 +63,11 @@ static const char tem_suff_name[] = ".tmp";
 #define INIFILE_SECTION_ARRAY			-29
 #define INIFILE_KEYVALUE_ARRAY			-20
 
-
-#define INIFILE_ERROR_ARRAYLEN			-4
-
 /**
 * operation parameter;
 * every buff char must be end of '\0'
 * or The buff char len must be effective
+* get fuction the value must point to effective addr and the value_len must be can use max len
 **/
 typedef struct ini_parameter{
 	char*	section;
@@ -75,23 +78,34 @@ typedef struct ini_parameter{
 	int		value_len;
 }INI_PARAMETER;
 
-//if filename end of '\0' the len can be 0
+/*
+ *if filename end of '\0' the len can be 0
+ *or the len is the filename len
+ *return 0 success
+ *else see error num
+ */
 int init_ini_file(const char *filename,int len);
 
 //if this interface is thread safe and this must consider whit other function safe
 //parameter.value must point empty str to stroge str.and the value_len is the len of this mem size
 int get_value_ofkey(int ini_fd,INI_PARAMETER *parameter);
 
+//update key value in one file will be sync to io file
 int update_value_ofkey(int ini_fd,INI_PARAMETER *parameter);
 
+//add key value in ini file under section so the section must exist
 int add_value_ofkey(int ini_fd,INI_PARAMETER *parameter);
 
+//delete key value in inifile ,the section and key must be exist.
 int delete_value_ofkey(int ini_fd,INI_PARAMETER *parameter);
 
+//delete section in inifile,the key value under this section will be delete 
 int delete_ini_section(int ini_fd,INI_PARAMETER *parameter);
 
+//add just empry section in ini file
 int add_ini_section(int ini_fd,INI_PARAMETER *parameter);
 
+//release all souce with ini file take in system
 void destroy_ini_source(int ini_fd);
 
 #ifdef __cplusplus
