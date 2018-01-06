@@ -1604,6 +1604,20 @@ void ini_file_info_out(int ini_fd)
 
 int main(int argc, char *argv[])
 {
+	int fd = 0;
+	while(1)
+	{
+		fd = init_ini_file("redis_cluster.ini",0);
+		if(fd < 0)
+		{
+			PERROR("init_ini_file :: %d\n",fd);
+			return fd;
+		}
+		ini_file_info_out(fd);
+		destroy_ini_source(fd);
+	}
+	return 0;
+#if 0
 	int fd = 0,ret = 0;
 	char value[100] = {0};
 	char get_set[] = "cluster",get_key[] = "node5";
@@ -1691,5 +1705,6 @@ int main(int argc, char *argv[])
 	ini_file_info_out(fd);
 	destroy_ini_source(fd);
 	return 0;
+#endif
 }
 

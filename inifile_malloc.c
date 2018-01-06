@@ -1000,7 +1000,9 @@ int init_ini_file(const char *filename,int len)
 		return INIFILE_ERROR_PARAMETER;
 	}
 	
-	pthread_mutex_init(&init_lock,PTHREAD_MUTEX_TIMED_NP);
+	if(head == NULL)
+		pthread_mutex_init(&init_lock,PTHREAD_MUTEX_TIMED_NP);
+	
 	pthread_mutex_lock(&init_lock);
 
 	if(len == 0)
@@ -1580,6 +1582,33 @@ error_out:
 	return ret;
 }
 
+int reload_ini_file(int ini_fd)
+{
+	int i = 0;
+	char filename[INIFILE_FILEALL_NAME_LEN] = {0};
+	INI_FILE_S *p = head;
+
+	for(i = 0;i < ini_fd;i++)
+	{
+		if(p)
+		{
+			p = p->next;
+		}else{
+			break;
+		}
+	}
+	if(p == NULL)
+	{
+		PERROR("The memory never load this inifile\n");
+		return INIFILE_NEVER_LOAD;
+	}
+	strcpy(filename,p->name);
+
+	destroy_ini_source(ini_fd);
+	return init_ini_file(filename,str_int_len(filename));
+	
+}
+
 
 void destroy_ini_source(int ini_fd)
 {
@@ -1659,6 +1688,20 @@ void ini_file_info_out(int ini_fd)
 
 int main(int argc, char *argv[])
 {
+	int fd = 0;
+	while(1)
+	{
+		fd = init_ini_file("redis_cluster.ini",0);
+		if(fd < 0)
+		{
+			PERROR("init_ini_file :: %d\n",fd);
+			return fd;
+		}
+		ini_file_info_out(fd);
+		destroy_ini_source(fd);
+	}
+	return 0;
+#if 0
 	int fd = 0,ret = 0;
 	char value[100] = {0};
 	char get_set[] = "cluster",get_key[] = "node5";
@@ -1746,5 +1789,6 @@ int main(int argc, char *argv[])
 	ini_file_info_out(fd);
 	destroy_ini_source(fd);
 	return 0;
+#endif
 }
 

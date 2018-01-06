@@ -1149,7 +1149,7 @@ int get_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
 	if(ini_fd < 0 || ini_fd >= MAX_OPERATION_FILE_NUM || parameter == NULL || parameter->section == NULL || parameter->key == NULL)
 	{
 		PERROR("There is something wrong with inside paramter:::%d\n",ini_fd);
-		return NULL;
+		return INIFILE_ERROR_PARAMETER;
 	}
 	p_ini_file += ini_fd;
 	pthread_mutex_lock(&p_ini_file->file_lock);
@@ -1221,7 +1221,7 @@ error_out:
 
 int add_value_ofkey(int ini_fd,INI_PARAMETER *parameter)
 {
-	int ret = 0,len = 0;
+	int ret = 0;
 	char line[INIFILE_MAX_CONTENT_LINELEN] = {0},*p_char = NULL;
 	INI_FILE *p_ini_file = ini_array.ini_array;
 	INI_SETION *p_section = NULL;
@@ -1404,7 +1404,7 @@ error_out:
 
 int add_ini_section(int ini_fd,INI_PARAMETER *parameter)
 {
-	int ret = 0,len = 0;
+	int ret = 0;
 	char line[INIFILE_MAX_CONTENT_LINELEN] = {0},*p_char = NULL;
 	INI_FILE *p_ini_file = ini_array.ini_array;
 	INI_SETION *p_section = NULL,*p_sec_end = NULL;
@@ -1540,6 +1540,20 @@ void ini_file_info_out(int ini_fd)
 
 int main(int argc, char *argv[])
 {
+	int fd = 0;
+	while(1)
+	{
+		fd = init_ini_file("redis_cluster.ini",0);
+		if(fd < 0)
+		{
+			PERROR("init_ini_file :: %d\n",fd);
+			return fd;
+		}
+		ini_file_info_out(fd);
+		destroy_ini_source(fd);
+	}
+	return 0;
+#if 0
 	int fd = 0,ret = 0;
 	char value[100] = {0};
 	char get_set[] = "cluster",get_key[] = "node5";
@@ -1564,5 +1578,6 @@ int main(int argc, char *argv[])
 	
 	destroy_ini_source(fd);
 	return 0;
+#endif
 }
 

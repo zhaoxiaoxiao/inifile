@@ -105,6 +105,7 @@ int delete_ini_section(int ini_fd,INI_PARAMETER *parameter);
 //add just empry section in ini file
 int add_ini_section(int ini_fd,INI_PARAMETER *parameter);
 
+int reload_ini_file(int ini_fd);//hot restart and update inifile info
 //release all souce with ini file take in system
 void destroy_ini_source(int ini_fd);
 
