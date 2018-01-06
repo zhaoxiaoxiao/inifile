@@ -73,7 +73,7 @@ void re_name_ini_file(const char *filename)
 	system (cmd_str);
 }
 
-void* malloc_memset(size_t size)
+static void* malloc_memset(size_t size)
 {
 	void *p = NULL;
 
@@ -88,7 +88,7 @@ void* malloc_memset(size_t size)
 	return p;
 }
 
-int str_int_len(const char *str)
+static int str_int_len(const char *str)
 {
 	int len = 0;
 	if(str == NULL)
@@ -165,31 +165,33 @@ void add_inifile_keyvalue(FILE_SECTION_NODE *p,KEY_VALUE_NODE *q)
 	}
 }
 
-int check_inifile_isinit(const char *filename,int len,INI_FILE_S **q)
+int check_inifile_isinit(char *filename,int len,INI_FILE_S **q)
 {
 	int ret = 0;
 	INI_FILE_S *p = head;
 
+	pthread_mutex_lock(&(p->file_lock));
 	do{
-		pthread_mutex_lock(&(p->file_lock));
 		if(p->name)
 		{
 			ret = memcmp((const void *)(p->name),(const void *)filename,len);
 			if(ret == 0)
 			{
 				PERROR("The inifile is already load in memory\n");
-				return INIFILE_ALREADY_INIT;
+				ret = INIFILE_ALREADY_INIT;
+				break;
 			}
 		}else if(*q == NULL){
 			*q = p;
+			p->name = filename;
 		}
-		pthread_mutex_unlock(&(p->file_lock));
 		
 		p = p->next;
 		if(*q == NULL)
 			ret++;
 	}while(p);
 	
+	pthread_mutex_unlock(&(p->file_lock));
 	return ret;
 }
 
@@ -1028,7 +1030,7 @@ int init_ini_file(const char *filename,int len)
 
 	if(head)
 	{
-		ret = check_inifile_isinit(filename,len,&p_file);
+		ret = check_inifile_isinit(file_name,len,&p_file);
 		if(ret < 0)
 		{
 			goto error_out;
@@ -1053,7 +1055,8 @@ int init_ini_file(const char *filename,int len)
 		goto error_out;
 	}
 
-	p_file->name = file_name;
+	if(p_file->name == NULL)
+		p_file->name = file_name;
 	if(add)
 		add_inifile_node(p_file);
 	pthread_mutex_unlock(&init_lock);
@@ -1062,8 +1065,13 @@ int init_ini_file(const char *filename,int len)
 error_out:
 	if(file_name)
 		free(file_name);
-	if(p_file && add == 1)
-		free(p_file);
+	if(p_file)
+	{
+		if(add == 1)
+			free(p_file);
+		else
+			p_file->name = NULL;
+	}
 	pthread_mutex_unlock(&init_lock);
 	return ret;
 }
